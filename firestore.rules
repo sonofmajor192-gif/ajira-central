@@ -1,0 +1,67 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper Primitives
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isSignedIn() && 
+             (exists(/databases/$(database)/documents/admins/$(request.auth.uid)) || 
+              request.auth.uid == '9xAJR163nwcEcRHHQho9waP7G1s2' ||
+              request.auth.token.email in ['sonofmajor192@gmail.com']);
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Job Entity Validation
+    function isValidJob(data) {
+      return data.keys().hasAll(['title', 'company', 'location', 'category', 'description', 'requirements', 'deadline', 'applyUrl', 'featured']) &&
+             data.title is string && data.title.size() <= 200 &&
+             data.company is string && data.company.size() <= 200 &&
+             data.location is string && data.location.size() <= 100 &&
+             data.category is string && data.category.size() <= 100 &&
+             data.description is string && data.description.size() <= 10000 &&
+             data.requirements is string && data.requirements.size() <= 10000 &&
+             data.deadline is string &&
+             data.applyUrl is string && data.applyUrl.size() <= 2048 &&
+             data.featured is bool;
+    }
+
+    // Jobs Collection
+    match /jobs/{jobId} {
+      // Public Read
+      allow get, list: if true;
+      
+      // Admin Write
+      allow create: if isAdmin() && isValidJob(incoming());
+      allow update: if isAdmin() && isValidJob(incoming());
+      allow delete: if isAdmin();
+    }
+
+    // Admins Collection - Used for bootstrapping
+    match /admins/{userId} {
+      // Initially, we might want to allow the first user to become admin or use a service account/blueprint
+      // For this app, let's allow read for the user if it matches their UID
+      allow read: if isSignedIn() && request.auth.uid == userId;
+      // Write is restricted
+      allow write: if false;
+    }
+  }
+}

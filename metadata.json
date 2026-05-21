@@ -1,0 +1,6 @@
+{
+  "name": "Ajira Central",
+  "description": "The premier job listing platform for Tanzania. Find and share professional opportunities across the country.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

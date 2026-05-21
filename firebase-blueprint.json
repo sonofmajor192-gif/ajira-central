@@ -1,0 +1,43 @@
+{
+  "entities": {
+    "Job": {
+      "title": "Job Listing",
+      "description": "A professional job opportunity in Tanzania",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "Job title" },
+        "company": { "type": "string", "description": "Hiring company name" },
+        "location": { "type": "string", "description": "Location in Tanzania (e.g., Dar es Salaam, Arusha)" },
+        "category": { "type": "string", "description": "Industry category (e.g., IT, Finance, Healthcare)" },
+        "description": { "type": "string", "description": "Full job description" },
+        "requirements": { "type": "string", "description": "Job requirements (can be a list of strings joined by newlines)" },
+        "deadline": { "type": "string", "format": "date-time", "description": "Application deadline" },
+        "applyUrl": { "type": "string", "description": "Original external link for direct application" },
+        "featured": { "type": "boolean", "description": "Whether the job is highlighted on the homepage" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp" },
+        "companyLogo": { "type": "string", "description": "URL to company logo image" }
+      },
+      "required": ["title", "company", "location", "category", "description", "deadline", "applyUrl"]
+    },
+    "Admin": {
+      "title": "Administrator",
+      "description": "Authorized administrative user",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" }
+      },
+      "required": ["uid", "email"]
+    }
+  },
+  "firestore": {
+    "jobs": {
+      "schema": "Job",
+      "description": "Publicly accessible job listings"
+    },
+    "admins": {
+      "schema": "Admin",
+      "description": "Restricted administrative users"
+    }
+  }
+}
